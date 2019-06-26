@@ -1,0 +1,65 @@
+#include <SoftwareSerial.h>
+SoftwareSerial EEBlue(10, 11); // RX | TX
+
+char junk;
+String inputString="";
+
+void setup()
+{
+pinMode(13, OUTPUT);
+pinMode(12, OUTPUT);
+Serial.begin(9600);
+EEBlue.begin(9600); //Default Baud for comm, it may be different for your Module. 
+Serial.println("The bluetooth gates are open.\n Connect to HC-05 from any other bluetooth device with 1234 as pairing key!.");
+}
+
+void loop()
+{
+// Feed any data from bluetooth to Terminal. 
+  if (EEBlue.available()) 
+// Serial.write(EEBlue.read()); //add new line
+// Feed all data from termial to bluetooth, 
+  {
+  while(EEBlue.available())  
+    {
+      char inChar = (char)EEBlue.read(); //read the input
+      inputString += inChar;        //make a string of the characters coming on bt
+    }
+    EEBlue.println(inputString);
+    while (EEBlue.available() > 0)
+    { junk = EEBlue.read() ; }      // clear the serial buffer
+    if(inputString == "l")
+    {         //in case of 'l' turn red LED on
+      digitalWrite(13, HIGH);       //turn on red LED
+      delay(1000);                  //hold for 3 seconds
+      digitalWrite(13, LOW);        //red LED turn off  
+    }
+    else if(inputString == "r")
+    {   //incase of 'r' turn blue LED on
+      digitalWrite(12, HIGH);
+      delay(1000);                  //hold for 3 seconds
+      digitalWrite(12, LOW);  
+    }
+    else if(inputString == "t")
+    {   //in case of going the wrong way a.k.a turn around, turn both on
+      digitalWrite(13, HIGH);
+      digitalWrite(12, HIGH);
+      delay(500);
+      digitalWrite(13, LOW);
+      digitalWrite(12, LOW);
+      delay(500);
+      digitalWrite(13, HIGH);
+      digitalWrite(12, HIGH);
+      delay(500);
+      digitalWrite(13, LOW);
+      digitalWrite(12, LOW);
+      delay(500);
+      digitalWrite(13, HIGH);
+      digitalWrite(12, HIGH);
+      delay(500);
+      digitalWrite(13, LOW);
+      digitalWrite(12, LOW);
+    }
+    inputString = ""; 
+  }
+}
